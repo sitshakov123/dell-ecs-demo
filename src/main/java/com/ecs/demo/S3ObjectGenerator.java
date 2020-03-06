@@ -22,7 +22,7 @@ public class S3ObjectGenerator {
 	private static final String FILE_CONTENT = "";
 	private static final int TEST_COUNT = 100;
 	private static int[] seqArray = new int[5];
-	private static int[] seqPadSize = new int[] { 3, 4, 2, 2, 3 };
+	private static int[] seqPadSize = new int[] { 3, 4, 2, 2, 3 };   // used for padding numeric path sections with zeros
 
 	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 1 }; // Generates 1,440 objects. Can be used as TINY bucket.
 //	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 2 }; // Generates 2,880 objects. Can be used as TINY bucket as well.
