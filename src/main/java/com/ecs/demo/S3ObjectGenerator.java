@@ -1,6 +1,5 @@
 package com.ecs.demo;
 
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
@@ -11,7 +10,6 @@ import com.ecs.demo.bucket.Bucket;
 import com.ecs.demo.bucket.BucketFactory;
 import com.ecs.demo.bucket.BucketType;
 import com.ecs.demo.service.ECSS3Service;
-import com.emc.object.s3.bean.GetObjectResult;
 import com.emc.object.s3.bean.S3Object;
 
 public class S3ObjectGenerator {
@@ -26,17 +24,21 @@ public class S3ObjectGenerator {
 	private static int[] seqArray = new int[5];
 	private static int[] seqPadSize = new int[] { 3, 4, 2, 2, 3 };
 
-	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 2 };
+	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 1 }; // Generates 1,440 objects. Can be used as TINY bucket.
+//	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 2 }; // Generates 2,880 objects. Can be used as TINY bucket as well.
+//	private static int[] pathLevelSize = new int[] { 3, 3, 12, 30, 3 }; // Generates 9,720 objects. Can be used as SMALL bucket.
+//	private static int[] pathLevelSize = new int[] { 7, 7, 12, 30, 7 }; // Generates 123,480 objects. Can be used as MEDIUM bucket.
+//	private static int[] pathLevelSize = new int[] { 15, 15, 12, 30, 15 }; // Generates 1,215,000 objects. Can be used as LARGE bucket.
 
 	private static ECSS3Service service;
 
 	public static void main(String[] args) {
 	
 		Bucket tinyBucket = BucketFactory.getBucket(BucketType.TINY, getBucketName(BucketType.TINY));
-		Bucket smallBucket = BucketFactory.getBucket(BucketType.SMALL, getBucketName(BucketType.SMALL));
-		Bucket mediumBucket = BucketFactory.getBucket(BucketType.MEDIUM, getBucketName(BucketType.MEDIUM));
-		Bucket largeBucket = BucketFactory.getBucket(BucketType.LARGE, getBucketName(BucketType.LARGE));
-		//Bucket[] buckets = new Bucket[] { tinyBucket, smallBucket, mediumBucket, largeBucket };
+//		Bucket smallBucket = BucketFactory.getBucket(BucketType.SMALL, getBucketName(BucketType.SMALL));
+//		Bucket mediumBucket = BucketFactory.getBucket(BucketType.MEDIUM, getBucketName(BucketType.MEDIUM));
+//		Bucket largeBucket = BucketFactory.getBucket(BucketType.LARGE, getBucketName(BucketType.LARGE));
+//		Bucket[] buckets = new Bucket[] { tinyBucket, smallBucket, mediumBucket, largeBucket };
 
 		try {
 			service = new ECSS3Service();
@@ -77,7 +79,7 @@ public class S3ObjectGenerator {
 		for (int x=0; x<TEST_COUNT; x++) {
 			generateRandomFileKey();
 			String path = generateKeyPath();
-			String filename = generateKeyFilename();
+			//String filename = generateKeyFilename();
 			System.out.println(path);
 			
 			try {

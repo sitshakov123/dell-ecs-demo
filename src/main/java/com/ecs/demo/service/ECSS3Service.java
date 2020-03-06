@@ -87,7 +87,6 @@ public class ECSS3Service {
 
 	public GetObjectResult<InputStream> getObject(Bucket bucket, String key) {
 		String bucketName = bucket.getName();
-		S3Object foundObject = null;
 
         ListObjectsRequest lor = new ListObjectsRequest(bucketName);
         if(key!=null && !key.isEmpty()) {
