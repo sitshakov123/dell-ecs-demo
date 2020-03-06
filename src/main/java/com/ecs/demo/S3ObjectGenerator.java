@@ -24,21 +24,20 @@ public class S3ObjectGenerator {
 	private static int[] seqArray = new int[5];
 	private static int[] seqPadSize = new int[] { 3, 4, 2, 2, 3 };   // used for padding numeric path sections with zeros
 
-//	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 1 }; // Generates 1,440 objects. Can be used as TINY bucket.
-	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 2 }; // Generates 2,880 objects. Can be used as TINY bucket as well.
-//	private static int[] pathLevelSize = new int[] { 3, 3, 12, 30, 3 }; // Generates 9,720 objects. Can be used as SMALL bucket.
-//	private static int[] pathLevelSize = new int[] { 7, 7, 12, 30, 7 }; // Generates 123,480 objects. Can be used as MEDIUM bucket.
-//	private static int[] pathLevelSize = new int[] { 10, 5, 12, 30, 100 }; // Generates 1,800,000 objects. Can be used as LARGE bucket.
+	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 1 };    // Generates 1,440 objects. Can be used as TINY bucket
+//	private static int[] pathLevelSize = new int[] { 2, 2, 12, 30, 2 };    // Generates 2,880 objects. Can be used as TINY bucket as well
+//	private static int[] pathLevelSize = new int[] { 3, 3, 12, 30, 3 };    // Generates 9,720 objects. Can be used as SMALL bucket
+//	private static int[] pathLevelSize = new int[] { 7, 7, 12, 30, 7 };    // Generates 123,480 objects. Can be used as MEDIUM bucket
+//	private static int[] pathLevelSize = new int[] { 10, 5, 12, 30, 100 }; // Generates 1,800,000 objects. Can be used as LARGE bucket
 
 	private static ECSS3Service service;
 
 	public static void main(String[] args) {
 	
-		Bucket tinyBucket = BucketFactory.getBucket(BucketType.TINY, getBucketName(BucketType.TINY));
-//		Bucket smallBucket = BucketFactory.getBucket(BucketType.SMALL, getBucketName(BucketType.SMALL));
-//		Bucket mediumBucket = BucketFactory.getBucket(BucketType.MEDIUM, getBucketName(BucketType.MEDIUM));
-//		Bucket largeBucket = BucketFactory.getBucket(BucketType.LARGE, getBucketName(BucketType.LARGE));
-//		Bucket[] buckets = new Bucket[] { tinyBucket, smallBucket, mediumBucket, largeBucket };
+		Bucket bucket = BucketFactory.getBucket(BucketType.TINY, getBucketName(BucketType.TINY));
+//		Bucket bucket = BucketFactory.getBucket(BucketType.SMALL, getBucketName(BucketType.SMALL));
+//		Bucket bucket = BucketFactory.getBucket(BucketType.MEDIUM, getBucketName(BucketType.MEDIUM));
+//		Bucket bucket = BucketFactory.getBucket(BucketType.LARGE, getBucketName(BucketType.LARGE));
 
 		try {
 			service = new ECSS3Service();
@@ -47,28 +46,24 @@ public class S3ObjectGenerator {
 			return;
 		}
 
-		//service.createBucket(tinyBucket);
-		//generateFiles(tinyBucket);
-		//service.deleteBucket(tinyBucket);
+		//service.createBucket(bucket);
+		//generateFiles(bucket);
+		//service.deleteBucket(bucket);
 		
-		runPerformanceTest(tinyBucket);
+		runPerformanceTest(bucket);
 		
-//		S3Object object = service.findObject(tinyBucket, "SourceSystem001/2001/01/01/File001_0001_01_01_001.txt");
+//		S3Object object = service.findObject(bucket, "SourceSystem001/2001/01/01/File001_0001_01_01_001.txt");
 //		System.out.println(object==null ? "Object not found" : "Found object: " + object.getKey());
 //		
-//		List<S3Object> objects = service.findObjects(tinyBucket, "");
+//		List<S3Object> objects = service.findObjects(bucket, "");
 //		System.out.println(objects.size()==0 ? "no objects were found" : "Found " + objects.size() + " objects");
 //
 //		try {
-//			service.listObjects(tinyBucket, "", "", "SourceSystem002/2000/10/10/File002_0001_10_10_002.txt", "3000");
+//			service.listObjects(bucket, "", "", "SourceSystem002/2000/10/10/File002_0001_10_10_002.txt", "3000");
 //		} catch (Exception e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//
-//		createBuckets(buckets);
-//
-//		deleteBuckets(buckets);
 
 	}
 
