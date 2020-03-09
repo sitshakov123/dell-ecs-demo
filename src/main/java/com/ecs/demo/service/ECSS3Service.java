@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ecs.demo.bucket.Bucket;
@@ -12,6 +13,7 @@ import com.emc.object.s3.S3Client;
 import com.emc.object.s3.bean.AbstractVersion;
 import com.emc.object.s3.bean.GetObjectResult;
 import com.emc.object.s3.bean.ListObjectsResult;
+import com.emc.object.s3.bean.ListVersionsResult;
 import com.emc.object.s3.bean.S3Object;
 import com.emc.object.s3.request.ListObjectsRequest;
 
@@ -36,18 +38,32 @@ public class ECSS3Service {
 		// delete the bucket content
         if (client.getBucketVersioning(bucketName).getStatus() != null) {
         	// delete all object versions
-            for (AbstractVersion version : client.listVersions(bucketName, null).getVersions()) {
-            	client.deleteVersion(bucketName, version.getKey(), version.getVersionId());
-            }
+        	ListVersionsResult result = client.listVersions(bucketName, null);
+        	while (true) {
+	            for (AbstractVersion version : result.getVersions()) {
+	            	client.deleteVersion(bucketName, version.getKey(), version.getVersionId());
+	            }
+
+	            if (!result.isTruncated()) break;
+	            
+	            result = client.listMoreVersions(result);
+        	}
         } else {
         	// delete all objects
-            for (S3Object object : client.listObjects(bucketName).getObjects()) {
-            	client.deleteObject(bucketName, object.getKey());
-            }
+        	ListObjectsResult result = client.listObjects(bucketName);
+        	while (true) {
+	            for (S3Object object : result.getObjects()) {
+	            	client.deleteObject(bucketName, object.getKey());
+	            }
+
+	            if (!result.isTruncated()) break;
+	            
+	            result = client.listMoreObjects(result);
+        	}
         }
         
         // delete the bucket
-        client.deleteBucket(bucketName);
+        //client.deleteBucket(bucketName);
 	}
 	
 	public void createObject(Bucket bucket, String key, String content) throws Exception {
@@ -98,14 +114,22 @@ public class ECSS3Service {
 	
 	public List<S3Object> findObjects(Bucket bucket, String path) {
 		String bucketName = bucket.getName();
+		List<S3Object> returnList = new ArrayList<>();
 
         ListObjectsRequest lor = new ListObjectsRequest(bucketName);
         if(path!=null && !path.isEmpty()) {
             lor.setPrefix(path);
         }
+        
+        ListObjectsResult result = client.listObjects(lor);
+    	while (true) {
+            returnList.addAll(result.getObjects());
 
-        ListObjectsResult res = client.listObjects(lor);
-        return res.getObjects();
+            if (!result.isTruncated()) break;
+            
+            result = client.listMoreObjects(result);
+    	}
+        return returnList;
    	}
 	
 	public void listObjects(Bucket bucket, String prefix, String delimiter, String marker, String maxKeys) throws Exception {
@@ -135,25 +159,36 @@ public class ECSS3Service {
                 lor.setMaxKeys(new Integer(maxKeys));
             }
 
-            ListObjectsResult res = client.listObjects(lor);
-            System.out.println("-----------------");
-            System.out.println("Bucket: " + res.getBucketName());
-            System.out.println("Prefix: " + res.getPrefix());
-            System.out.println("Delimiter: " + res.getDelimiter());
-            System.out.println("Marker: " + res.getMarker());
-            System.out.println("IsTruncated? " + res.isTruncated());
-            System.out.println("NextMarker: " + res.getNextMarker());
-            System.out.println();
-            if(res.getCommonPrefixes() != null) {
-                for(String s : res.getCommonPrefixes()) {
-                    System.out.println("CommonPrefix: " + s);
-                }
-            }
-            System.out.printf("%30s %10s %s\n", "LastModified", "Size", "Key");
-            System.out.println("------------------------------ ---------- ------------------------------------------");
-            for(S3Object obj : res.getObjects()) {
-                System.out.printf("%30s %10d %s\n", obj.getLastModified().toString(), obj.getSize(), obj.getKey());
-            }
+            int totalObjects = 0;
+            ListObjectsResult result = client.listObjects(lor);
+        	while (true) {
+        		totalObjects += result.getObjects().size();
+        		
+	            System.out.println("-----------------");
+	            System.out.println("Bucket: " + result.getBucketName());
+	            System.out.println("Prefix: " + result.getPrefix());
+	            System.out.println("Delimiter: " + result.getDelimiter());
+	            System.out.println("Marker: " + result.getMarker());
+	            System.out.println("IsTruncated? " + result.isTruncated());
+	            System.out.println("NextMarker: " + result.getNextMarker());
+	            System.out.println();
+	            if(result.getCommonPrefixes() != null) {
+	                for(String s : result.getCommonPrefixes()) {
+	                    System.out.println("CommonPrefix: " + s);
+	                }
+	            }
+	            System.out.printf("%30s %10s %s\n", "LastModified", "Size", "Key");
+	            System.out.println("------------------------------ ---------- ------------------------------------------");
+	            for(S3Object obj : result.getObjects()) {
+	                System.out.printf("%30s %10d %s\n", obj.getLastModified().toString(), obj.getSize(), obj.getKey());
+	            }
+	            
+	            if (!result.isTruncated()) break;
+	            
+	            result = client.listMoreObjects(result);
+        	}
+        	
+        	System.out.println("\nTotal objects: " + totalObjects + "\n\n");
             
             System.out.println( "Another? (Y/N) " );
             String another = new BufferedReader( new InputStreamReader( System.in ) ).readLine();

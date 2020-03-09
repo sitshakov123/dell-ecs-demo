@@ -20,7 +20,7 @@ public class S3ObjectGenerator {
 	private static final String FILENAME_PREFIX = "File";
 	private static final String FILENAME_EXTENSION = ".txt";
 	private static final String FILE_CONTENT = "";
-	private static final int TEST_COUNT = 50;
+	private static final int TEST_COUNT = 100;
 	private static int[] seqArray = new int[5];
 	private static int[] seqPadSize = new int[] { 3, 4, 2, 2, 3 };   // used for padding numeric path sections with zeros
 
@@ -38,6 +38,8 @@ public class S3ObjectGenerator {
 //		Bucket bucket = BucketFactory.getBucket(BucketType.SMALL, getBucketName(BucketType.SMALL));
 //		Bucket bucket = BucketFactory.getBucket(BucketType.MEDIUM, getBucketName(BucketType.MEDIUM));
 //		Bucket bucket = BucketFactory.getBucket(BucketType.LARGE, getBucketName(BucketType.LARGE));
+		
+		System.out.println("Executing on bucket: " + bucket.getName());
 
 		try {
 			service = new ECSS3Service();
@@ -47,7 +49,7 @@ public class S3ObjectGenerator {
 		}
 
 		//service.createBucket(bucket);
-		//generateFiles(bucket);
+		//generateObjects(bucket);
 		//service.deleteBucket(bucket);
 		
 		runPerformanceTest(bucket);
@@ -59,7 +61,7 @@ public class S3ObjectGenerator {
 //		System.out.println(objects.size()==0 ? "no objects were found" : "Found " + objects.size() + " objects");
 //
 //		try {
-//			service.listObjects(bucket, "", "", "SourceSystem002/2000/10/10/File002_0001_10_10_002.txt", "3000");
+//			service.listObjects(bucket, "", "", "", "");
 //		} catch (Exception e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
@@ -68,34 +70,37 @@ public class S3ObjectGenerator {
 	}
 
 	private static void runPerformanceTest(Bucket bucket) {
+		String path = "";
+		String filename = "";
 		long totalTime = 0L;
-		long startTime = System.currentTimeMillis();
 		
 		for (int x=0; x<TEST_COUNT; x++) {
 			generateRandomFileKey();
-			String path = generateKeyPath();
-			//String filename = generateKeyFilename();
-			System.out.println(path);
+			path = generateKeyPath();
+			//filename = generateKeyFilename();
+			String fullPath = path + filename;
+			System.out.print(fullPath);
 			
+			long startTime = System.currentTimeMillis();
 			try {
-				 List<S3Object> objects = service.findObjects(bucket, path);
-				 System.out.println("Found objects: " + objects.size());
+				 List<S3Object> objects = service.findObjects(bucket, fullPath);
+				 System.out.print("     Found objects: " + objects.size());
 			} catch (Exception ex) {
-				System.out.println("Object not found");
+				System.out.print("     Object not found");
 				
 			}
-
 			long finishTime = System.currentTimeMillis();
+			
 			long elapsedTime = finishTime - startTime;
 			totalTime += elapsedTime;
-			System.out.println(elapsedTime);
+			System.out.println("     " + elapsedTime);
 		}
 		
-		System.out.println("Average Time per object: " + (totalTime/TEST_COUNT));
+		System.out.println("\nAverage Time per object: " + (totalTime / TEST_COUNT));
 		
 	}
 
-	private static void generateFiles(Bucket bucket) {
+	private static void generateObjects(Bucket bucket) {
 		int objectsCreatedCount = 0;
 		
 		for (seqArray[0] = 0; seqArray[0] < pathLevelSize[0]; seqArray[0]++) {
