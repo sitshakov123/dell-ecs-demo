@@ -4,13 +4,8 @@ import com.emc.object.s3.S3Client;
 import com.emc.object.s3.S3Config;
 import com.emc.object.s3.jersey.S3JerseyClient;
 
-import org.apache.commons.codec.binary.Base64;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
 
 /**
  * Factory class to create the ECS S3 client.  The client will be used in the examples for the
